@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.13.4",
     "http-server": "^0.9.0",
+    "nodemon": "^1.9.2",
     "socket.io": "^1.4.6"
   }
 }
