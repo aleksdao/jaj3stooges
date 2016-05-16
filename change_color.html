@@ -8,14 +8,49 @@
     </div>
   </body>
   <script src="/socket.io/socket.io.js"></script>
+  <script src="/node_modules/tone/build/Tone.js"></script>
+
   <script>
     var socket = io.connect();
-    socket.on('changecolor', function (data) {
+    // socket.on('changecolor', function (data) {
+    //
+    //   console.log(data);
+    //  var body = document.getElementById('changeColor');
+    //  body.style.backgroundColor = data.color;
+    //  socket.emit('my other event', { my: 'data' });
+  </script>
 
-      console.log(data);
-     var body = document.getElementById('changeColor');
-     body.style.backgroundColor = data.color;
-     socket.emit('my other event', { my: 'data' });
- });
+  <script>
+  var show;
+  Tone.Transport.set({bpm: 60});
+
+
+  console.log(Tone.Transport.position)
+
+  socket.on('play', function(data){
+    console.log(data)
+    show = data.show;
+    Tone.Transport.start();
+  });
+
+  Tone.Transport.scheduleRepeat(callback, "4n", 0);
+
+  function callback(time){
+
+    var currPos = Tone.Transport.position;
+
+    if(currPos === show.length){
+      Tone.Transport.position = 0;
+      return Tone.Transport.stop();
+    }
+
+
+    var body = document.getElementById('changeColor');
+
+    if(show[currPos])
+    body.style.backgroundColor = show[currPos].changeColor;
+
+  }
+
   </script>
 </html>
