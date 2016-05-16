@@ -1,56 +1,58 @@
 <html lang="en">
-  <head>
 
-  </head>
-  <body id="changeColor" bgcolor="#E6E6FA">
-    <div>
-      <h1>Hello world!</h1>
+<head>
+    <title> Welcome to the Show </title>
+</head>
+
+<body id="changeColor" bgcolor="#E6E6FA">
+     <div>
+        <h1>Boots and Cats</h1>
     </div>
-  </body>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="/node_modules/tone/build/Tone.js"></script>
+</body>
 
-  <script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/node_modules/tone/build/Tone.js"></script>
+
+<script>
+    //connect to socket server
     var socket = io.connect();
-    // socket.on('changecolor', function (data) {
-    //
-    //   console.log(data);
-    //  var body = document.getElementById('changeColor');
-    //  body.style.backgroundColor = data.color;
-    //  socket.emit('my other event', { my: 'data' });
-  </script>
+</script>
 
-  <script>
-  var show;
-  Tone.Transport.set({bpm: 60});
+<script>
+    //init the show
+    var show;
 
+    //set show speed: 60 BPM = 1 quarter per second
+    Tone.Transport.set({
+        bpm: 60
+    });
 
-  console.log(Tone.Transport.position)
+    //wait for the play command
+    socket.on('play', function(data) {
+        show = data.show; //get the show script
+        Tone.Transport.start(); //start Transport
+    });
 
-  socket.on('play', function(data){
-    console.log(data)
-    show = data.show;
-    Tone.Transport.start();
-  });
+    //schedule a listener to fire every quarter note
+    Tone.Transport.scheduleRepeat(runEvent, "4n", 0);
 
-  Tone.Transport.scheduleRepeat(callback, "4n", 0);
+    function runEvent(time) {
 
-  function callback(time){
+        //grab current time code position
+        var currPos = Tone.Transport.position;
 
-    var currPos = Tone.Transport.position;
+        //check to see if the show is over, if so, stop Transport
+        if (currPos === show.length) {
+            Tone.Transport.position = 0;
+            return Tone.Transport.stop();
+        }
 
-    if(currPos === show.length){
-      Tone.Transport.position = 0;
-      return Tone.Transport.stop();
+        var body = document.getElementById('changeColor');
+
+        if (show[currPos]) //if there is an event at this time, change the DOM
+            body.style.backgroundColor = show[currPos].changeColor;
+
     }
+</script>
 
-
-    var body = document.getElementById('changeColor');
-
-    if(show[currPos])
-    body.style.backgroundColor = show[currPos].changeColor;
-
-  }
-
-  </script>
 </html>
