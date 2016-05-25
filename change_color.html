@@ -12,10 +12,16 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/node_modules/tone/build/Tone.js"></script>
+<!-- <script src="/javascripts/libs/socket.io.min.js"></script> -->
+<script src="/node_modules/socket-ntp-krcmod/client/ntp.js"></script>
 
 <script>
     //connect to socket server
     var socket = io.connect();
+    ntp.init(socket);
+    var offset = ntp.offset();
+    var serverTime = ntp.serverTime();
+    console.log(offset, serverTime);
 </script>
 
 <script>
@@ -24,7 +30,7 @@
 
     //set show speed: 60 BPM = 1 quarter per second
     Tone.Transport.set({
-        bpm: 60
+        bpm: 90
     });
 
     //wait for the play command

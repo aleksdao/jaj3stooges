@@ -9,6 +9,8 @@ var io = require('socket.io')(server);
 
 var colors = ['red','blue','black','purple'];
 
+var ntp = require('socket-ntp');
+
 server.listen(3000, function(){
   console.log('listening on port 3000');
 });
@@ -16,7 +18,7 @@ server.listen(3000, function(){
 app.use('/node_modules', express.static(path.join(__dirname, './node_modules')));
 
 app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/change_color.html');
+  res.sendFile(__dirname + '/ntp-sync.html');
 });
 
 app.get('/play', function(req, res){
@@ -39,6 +41,7 @@ app.get('/play', function(req, res){
 // },300);
 
 var show = {
+  time: +new Date('2016-05-24T23:52:00Z'), // + converts the date into milliseconds
   length: '3:0:0',
   '0:0:0': {changeColor: randColor()},
   '0:1:0': {changeColor: randColor()},
@@ -60,6 +63,7 @@ function randColor(){
 io.on('connection', function (socket) {
 
   console.log('user connected');
+  ntp.sync(socket);
 
 });
 io.on('disconnect', function (socket) {

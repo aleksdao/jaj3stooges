@@ -1,0 +1,84 @@
+<html>
+  <head>
+    <title> Welcome to the Show </title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/node_modules/socket-ntp/client/ntp.js"></script>
+    <script src="/node_modules/tone/build/Tone.js"></script>
+
+  </head>
+
+
+
+
+  <body id="changeColor" bgcolor="#E6E6FA">
+       <div>
+          <h1>Boots and Cats</h1>
+      </div>
+      <span id="offset"></span>
+
+  </body>
+
+  <script>
+
+    var socket = io.connect();
+    var arr = []
+
+    ntp.init(socket);
+    setInterval(function () {
+      $('#offset').text(ntp.offset());
+    }, 1000);
+  </script>
+
+  <script>
+      //init the show
+      var show;
+
+      //set show speed: 60 BPM = 1 quarter per second
+      Tone.Transport.set({
+          bpm: 60
+      });
+
+      //wait for the play command
+      socket.on('play', function(data) {
+          show = data.show; //get the show script
+
+
+          // setTimeout(function () {
+          //   Tone.Transport.start();
+          //   Tone.Transport.scheduleRepeat(runEvent, "4n", 0);
+          // }, show.time + ntp.offset() - Date.now() );
+
+          // Tone.Transport.start(10);
+          // Tone.Transport.scheduleRepeat(runEvent, "4n", 0);
+
+          // show.time + ntp.offset() - Date.now()
+          setTimeout(function () {
+            Tone.Transport.start();
+            Tone.Transport.scheduleRepeat(runEvent, "4n", 0);
+          }, data.show.time - Date.now() + ntp.offset());
+      });
+
+      //schedule a listener to fire every quarter note
+
+
+      function runEvent(time) {
+
+          //grab current time code position
+          var currPos = Tone.Transport.position;
+
+          //check to see if the show is over, if so, stop Transport
+          if (currPos === show.length) {
+              Tone.Transport.position = 0;
+              return Tone.Transport.stop();
+          }
+
+          var body = document.getElementById('changeColor');
+
+          if (show[currPos]) //if there is an event at this time, change the DOM
+              body.style.backgroundColor = show[currPos].changeColor;
+
+      }
+  </script>
+</html>
